@@ -1,0 +1,10 @@
+streamlit
+transformers
+torch
+datasets
+chat-downloader
+pandas
+plotly
+scipy
+numpy
+emoji
