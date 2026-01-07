@@ -2,9 +2,10 @@ from chat_downloader import ChatDownloader
 import pandas as pd
 import datetime
 
-def get_chat_dataframe(url, max_messages=None):
+def get_chat_dataframe(url, max_messages=None, progress_callback=None):
     """
     Downloads chat from a Twitch VOD or Clip URL and returns a Pandas DataFrame.
+    Apps can provide a progress_callback(current_count) to update UI.
     """
     downloader = ChatDownloader()
     chats = []
@@ -30,6 +31,9 @@ def get_chat_dataframe(url, max_messages=None):
             })
             
             count += 1
+            if progress_callback and count % 50 == 0:
+                progress_callback(count)
+
             if max_messages and count >= max_messages:
                 break
                 

@@ -41,7 +41,16 @@ if analyze_btn and vod_url:
         
         # Step 1: Download Chat
         st.write("Fetching chat logs...")
-        df = get_chat_dataframe(vod_url, max_messages=max_msgs)
+        download_progress = st.progress(0)
+        
+        def update_download_progress(count):
+            # Scale progress based on max_msgs (capped at 90% until done)
+            if max_msgs:
+                prog = min(count / max_msgs, 0.95)
+                download_progress.progress(prog, text=f"Downloaded {count} messages...")
+        
+        df = get_chat_dataframe(vod_url, max_messages=max_msgs, progress_callback=update_download_progress)
+        download_progress.progress(1.0, text="Download Complete!")
         
         if df.empty:
             status.update(label="Failed to download chat.", state="error")
@@ -52,7 +61,24 @@ if analyze_btn and vod_url:
         
         # Step 2: Analyze Sentiment
         st.write("Analyzing sentiment (this may take a moment)...")
-        results = analyzer.predict_batch(df['message'].tolist())
+        sentiment_progress = st.progress(0)
+        
+        # Batch inference with progress
+        messages = df['message'].tolist()
+        results = []
+        batch_size = 10
+        total_msgs = len(messages)
+        
+        for i in range(0, total_msgs, batch_size):
+            batch = messages[i:i+batch_size]
+            batch_results = analyzer.predict_batch(batch)
+            results.extend(batch_results)
+            
+            # Update progress
+            prog = min((i + len(batch)) / total_msgs, 1.0)
+            sentiment_progress.progress(prog, text=f"Analyzed {i + len(batch)}/{total_msgs} messages")
+        
+        sentiment_progress.empty() # Clear progress bar
         
         # Parse results
         df['sentiment_label'] = [r['label'] for r in results]
