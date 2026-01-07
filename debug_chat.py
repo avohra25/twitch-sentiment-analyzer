@@ -12,7 +12,7 @@ def test_download():
     
     # I'll try a generic reliable test URL if I can, but for now let's just use a dummy one 
     # and see if it fails fast or hangs.
-    url = "https://www.twitch.tv/videos/2143026857" # Random VOD ID, might be dead.
+    url = "https://www.twitch.tv/videos/2663165637"
     
     print(f"Testing download from {url}...")
     downloader = ChatDownloader()

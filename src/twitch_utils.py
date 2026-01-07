@@ -7,16 +7,24 @@ def get_chat_dataframe(url, max_messages=None, progress_callback=None):
     Downloads chat from a Twitch VOD or Clip URL and returns a Pandas DataFrame.
     Apps can provide a progress_callback(current_count) to update UI.
     """
-    downloader = ChatDownloader()
+    import sys
+    print("DEBUG: Calling get_chat_dataframe...", file=sys.__stdout__)
+    
+    # Initialize with quiet=True to prevent stdout interference
+    downloader = ChatDownloader(quiet=True)
     chats = []
     
     try:
+        print(f"DEBUG: Attempting to fetch chat from {url}", file=sys.__stdout__)
         # Get chat generator
         chat_iterator = downloader.get_chat(url)
+        print("DEBUG: Got chat iterator!", file=sys.__stdout__)
         
         count = 0
         for message in chat_iterator:
-            
+            if count == 0:
+                print("DEBUG: First message received!", file=sys.__stdout__)
+                
             # Basic info
             timestamp = message.get('time_in_seconds', 0) # Time offset in VOD
             author = message.get('author', {}).get('name', 'Anonymous')
@@ -35,12 +43,14 @@ def get_chat_dataframe(url, max_messages=None, progress_callback=None):
                 progress_callback(count)
 
             if max_messages and count >= max_messages:
+                print("DEBUG: Max messages reached.", file=sys.__stdout__)
                 break
                 
     except Exception as e:
-        print(f"Error downloading chat: {e}")
+        print(f"Error downloading chat: {e}", file=sys.__stdout__)
         return pd.DataFrame() # Return empty on error
         
+    print(f"DEBUG: Finished downloading {len(chats)} messages.", file=sys.__stdout__)
     return pd.DataFrame(chats)
 
 def parse_chat_log_file(file_obj):
