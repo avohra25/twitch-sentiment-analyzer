@@ -10,8 +10,8 @@ def get_chat_dataframe(url, max_messages=None, progress_callback=None):
     import sys
     print("DEBUG: Calling get_chat_dataframe...", file=sys.__stdout__)
     
-    # Initialize with quiet=True to prevent stdout interference
-    downloader = ChatDownloader(quiet=True)
+    # Initialize
+    downloader = ChatDownloader()
     chats = []
     
     try:
