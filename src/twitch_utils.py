@@ -58,3 +58,24 @@ def parse_chat_log_file(file_obj):
         return df
     except:
         return pd.DataFrame()
+
+def generate_mock_chat_dataframe(num_messages=100):
+    """
+    Generates fake chat data for debugging UI/Model without network.
+    """
+    import random
+    
+    mock_msgs = [
+        "POG", "LUL", "This is amazing!", "WTF happened?", "Kappa", 
+        "ResidentSleeper", "So boring", "Hype!", "Love this streamer", "Terrible play"
+    ]
+    
+    chats = []
+    for i in range(num_messages):
+        chats.append({
+            'timestamp': i * 2,
+            'author': f"User{i}",
+            'message': random.choice(mock_msgs),
+            'time_text': str(datetime.timedelta(seconds=i*2))
+        })
+    return pd.DataFrame(chats)

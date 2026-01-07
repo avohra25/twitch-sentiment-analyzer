@@ -4,6 +4,7 @@ import plotly.express as px
 from src.twitch_utils import get_chat_dataframe
 from src.model import SentimentAnalyzer
 import numpy as np
+import time
 
 # Page Layout
 st.set_page_config(page_title="Twitch Sentiment Analyzer", layout="wide")
@@ -36,6 +37,9 @@ with col1:
 with col2:
     analyze_btn = st.button("Analyze VOD", type="primary", use_container_width=True)
 
+# Debug Options
+use_mock = st.sidebar.checkbox("🛠 Use Mock Data (Debug)", help="Check this if download hangs")
+
 if analyze_btn and vod_url:
     with st.status("Processing VOD...", expanded=True) as status:
         
@@ -49,7 +53,13 @@ if analyze_btn and vod_url:
                 prog = min(count / max_msgs, 0.95)
                 download_progress.progress(prog, text=f"Downloaded {count} messages...")
         
-        df = get_chat_dataframe(vod_url, max_messages=max_msgs, progress_callback=update_download_progress)
+        if use_mock:
+            from src.twitch_utils import generate_mock_chat_dataframe
+            time.sleep(1) # Simulate delay
+            df = generate_mock_chat_dataframe(max_msgs)
+        else:
+            df = get_chat_dataframe(vod_url, max_messages=max_msgs, progress_callback=update_download_progress)
+            
         download_progress.progress(1.0, text="Download Complete!")
         
         if df.empty:
