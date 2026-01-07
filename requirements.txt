@@ -2,7 +2,7 @@ streamlit
 transformers
 torch
 datasets
-chat-downloader
+git+https://github.com/SebastienTromp/chat-downloader.git
 pandas
 plotly
 scipy
